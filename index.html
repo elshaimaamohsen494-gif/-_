@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>رحلة أبطال الجمع والطرح</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@500;800&display=swap" rel="stylesheet">
+<style>
+:root{--c:#ff8fb1;--c2:#fff1c9;--ink:#2b2350;--w:#fff}
+*{box-sizing:border-box;margin:0}
+body{font-family:'Baloo Bhaijaan 2','Segoe UI',Tahoma,sans-serif;color:var(--ink);min-height:100vh;background:radial-gradient(circle at 20% 10%,var(--c2),#fff 70%);transition:background .6s;overflow-x:hidden}
+#app{max-width:860px;margin:0 auto;padding:16px 14px 40px}
+.card{background:var(--w);border:4px solid var(--c);border-radius:28px;padding:22px;box-shadow:0 8px 0 var(--c);animation:pop .45s}
+@keyframes pop{from{transform:translateY(18px) scale(.97);opacity:0}to{transform:none;opacity:1}}
+h1{font-size:clamp(28px,6vw,48px);line-height:1.3;text-align:center;color:var(--c)}
+h2{font-size:clamp(22px,4.5vw,32px);text-align:center;margin-bottom:10px;color:var(--c)}
+.robot{font-size:92px;text-align:center;animation:bob 2s infinite ease-in-out}
+@keyframes bob{50%{transform:translateY(-12px) rotate(4deg)}}
+.bub{background:var(--c2);border-radius:20px;padding:10px 16px;text-align:center;font-size:20px;margin:8px auto 14px;max-width:520px}
+input{width:100%;font:inherit;font-size:24px;text-align:center;padding:12px;border:4px solid var(--c);border-radius:18px;margin:8px 0;outline:none}
+.btn{font:inherit;font-size:24px;font-weight:800;color:#fff;background:var(--c);border:0;border-radius:20px;padding:12px 26px;cursor:pointer;box-shadow:0 6px 0 rgba(0,0,0,.22);margin:6px;transition:transform .1s}
+.btn:active{transform:translateY(5px);box-shadow:0 1px 0 rgba(0,0,0,.22)}
+.btn.alt{background:#fff;color:var(--ink);border:3px solid var(--c)}
+.btn:focus-visible,input:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
+.row{text-align:center}
+#mute{position:fixed;top:10px;left:10px;z-index:9;font-size:26px;background:#fff;border:3px solid var(--c);border-radius:50%;width:52px;height:52px;cursor:pointer}
+.top{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;font-size:20px}
+.tm{font-size:30px;font-weight:800;background:var(--c);color:#fff;border-radius:16px;padding:2px 18px;min-width:96px;text-align:center}
+.tm.warn{background:#e53935;animation:shake .5s infinite}
+@keyframes shake{25%{transform:rotate(-4deg) scale(1.08)}75%{transform:rotate(4deg) scale(1.08)}}
+.bar{height:18px;background:#eee;border-radius:12px;overflow:hidden;margin-bottom:14px}
+.bar i{display:block;height:100%;background:var(--c);border-radius:12px;transition:width .5s}
+.q{font-size:clamp(22px,5vw,34px);text-align:center;line-height:1.7;margin:8px 0 16px;min-height:90px}
+.eq{direction:ltr;unicode-bidi:isolate;display:inline-block;font-size:1.3em;font-weight:800}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.opt{font:inherit;font-size:clamp(24px,5vw,34px);font-weight:800;direction:ltr;background:var(--c2);border:4px solid var(--c);border-radius:20px;padding:16px;cursor:pointer;color:var(--ink);transition:transform .15s}
+.opt:hover:not(:disabled){transform:scale(1.04)}
+.opt:disabled{opacity:.4;cursor:not-allowed}
+.opt.ok{background:#7ed957;border-color:#2e9e2e;opacity:1}
+.fb{margin-top:14px;border-radius:20px;padding:12px 16px;font-size:19px;line-height:1.8;animation:pop .3s}
+.fb.good{background:#e3f9d8}.fb.warn{background:#fff3c4}.fb.bad{background:#ffe0e0}
+.fb .st{direction:rtl;font-size:17px;margin-top:4px;background:#fff9;border-radius:12px;padding:6px 10px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:12px 0}
+.stat{background:var(--c2);border-radius:18px;padding:10px;text-align:center;font-size:18px}
+.stat b{display:block;font-size:30px}
+.ex{background:var(--c2);border-radius:20px;padding:12px 16px;margin:10px 0;font-size:19px;line-height:1.9}
+.rev{background:#fff5f5;border:2px dashed #e57373;border-radius:16px;padding:8px 12px;margin:8px 0;font-size:17px;line-height:1.8}
+table{width:100%;border-collapse:collapse;font-size:18px}
+th,td{padding:8px 4px;text-align:center;border-bottom:2px solid var(--c2)}
+th{background:var(--c);color:#fff}
+.conf{position:fixed;top:-40px;font-size:28px;z-index:20;pointer-events:none;animation:fall 2.2s linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(540deg)}}
+@media(max-width:520px){.opts{gap:8px}.card{padding:14px}}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.01s!important}}
+</style>
+</head>
+<body>
+<button id="mute" aria-label="كتم الصوت">🔊</button>
+<div id="app"></div>
+<script>
+const $=s=>document.querySelector(s),app=$('#app');
+const R=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+const sh=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=R(0,i);[a[i],a[j]]=[a[j],a[i]]}return a};
+const E=s=>`<span class="eq">${s}</span>`;
+const NM=['الآحاد','العشرات','المئات','الآلاف','عشرات الآلاف'];
+let muted=false,AC=null;
+$('#mute').onclick=()=>{muted=!muted;$('#mute').textContent=muted?'🔇':'🔊'};
+function beep(seq,type='sine'){if(muted)return;try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();let t=AC.currentTime;seq.forEach(f=>{const o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.value=f;g.gain.setValueAtTime(.15,t);g.gain.exponentialRampToValueAtTime(.001,t+.18);o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+.18);t+=.15})}catch(e){}}
+const good=()=>beep([523,659,784,1046]),bad=()=>beep([220,170],'square'),tick=()=>beep([880]);
+function confetti(){for(let i=0;i<34;i++){const d=document.createElement('div');d.className='conf';d.textContent=['⭐','🎉','✨','🎊','🌟'][R(0,4)];d.style.left=R(0,95)+'vw';d.style.animationDelay=Math.random()*.5+'s';document.body.appendChild(d);setTimeout(()=>d.remove(),3000)}}
+
+/* ---------- شرح الخطوات ---------- */
+function addSteps(a,b){let x=a,y=b,c=0,s=[];for(let i=0;x>0||y>0||c>0;i++){const d=x%10+y%10+c;s.push(`${NM[i]}: <span class="eq">${x%10} + ${y%10}${c?' + 1':''} = ${d}</span>${d>9?` ← نكتب ${d%10} ونحمل 1`:''}`);c=d>9?1:0;x=(x/10)|0;y=(y/10)|0}return s.join('<br>')}
+function subSteps(a,b){let x=a,y=b,br=0,s=[];const n=String(a).length;for(let i=0;i<n;i++){const t=x%10-br,u=y%10;if(t<u){s.push(`${NM[i]}: ${t} أصغر من ${u}، نستلف 1 من المنزلة التالية فيصبح <span class="eq">${t+10} − ${u} = ${t+10-u}</span>`);br=1}else{s.push(`${NM[i]}: <span class="eq">${t} − ${u} = ${t-u}</span>`);br=0}x=(x/10)|0;y=(y/10)|0}return s.join('<br>')}
+
+/* ---------- بناء الأسئلة ---------- */
+function mc(q,ans,st,k){const s=new Set([ans]);for(const x of sh([ans+10,ans-10,ans+100,ans-100,ans+1000,ans-1000,ans+1,ans-1,ans+20])){if(s.size>=4)break;if(x>0)s.add(x)}return{q,o:sh([...s]).map(String),a:String(ans),st,k}}
+function tf(a,b,op){const ans=op=='+'?a+b:a-b;const ok=Math.random()<.5;let shown=ok?ans:ans+sh([-100,-10,10,100,-1000,1000])[0];if(shown<=0||shown==ans&&!ok)shown=ans+10;const isT=shown==ans;
+ return{q:`صح أم خطأ؟<br>${E(`${a} ${op=='+'?'+':'−'} ${b} = ${shown}`)}`,o:['صح','خطأ'],a:isT?'صح':'خطأ',st:`الناتج الصحيح هو ${ans}.<br>`+(op=='+'?addSteps(a,b):subSteps(a,b)),k:op=='+'?'a':'s'}}
+const qa=(a,b)=>mc(`أوجد الناتج:<br>${E(`${a} + ${b} = ؟`)}`,a+b,addSteps(a,b),'a');
+const qs=(a,b)=>mc(`أوجد الناتج:<br>${E(`${a} − ${b} = ؟`)}`,a-b,subSteps(a,b),'s');
+function subBr(lo,hi){let a,b;do{a=R(lo,hi);b=R(Math.floor(lo/2),a-1)}while(a-b<1||b%10<=a%10);return[a,b]}
+function addCar(lo,hi){let a,b;do{a=R(lo,hi);b=R(lo,hi)}while((a%10)+(b%10)<10);return[a,b]}
+
+function g1(){const q=[];
+ q.push(qa(R(20,99),R(100,899)),qa(R(30,90),R(100,800)));
+ let p=addCar(100,499);q.push(qa(...p));p=addCar(150,450);q.push(qa(...p));q.push(qa(R(100,499),R(100,499)));
+ q.push(qs(R(120,300),R(5,9)));p=subBr(300,999);q.push(qs(...p));q.push(qs(...subBr(400,999)));
+ return q}
+function g2(){const q=[];
+ q.push(qa(...addCar(1000,4999)),qa(R(1000,5000),R(1000,4000)));
+ q.push(qs(...subBr(2000,9999)),qs(...subBr(3000,8000)));
+ q.push(tf(...addCar(1000,4999),'+'),tf(...subBr(3000,9999),'-'));
+ q.push(qa(...addCar(2000,4500)),qs(R(5000,9999),R(1000,4999)));
+ return sh(q)}
+function g3(){const T=[
+ ()=>{const a=R(1200,3000),b=R(300,900),c=R(200,800);return mc(`في المتجر ${a} تفاحة. بيعت ${b} تفاحة، ثم وصلت شحنة جديدة فيها ${c} تفاحة. كم تفاحة في المتجر الآن؟`,a-b+c,`الخطوة 1: ${a} − ${b} = ${a-b}<br>الخطوة 2: ${a-b} + ${c} = ${a-b+c}`,'w')},
+ ()=>{const a=R(1000,2500),b=R(500,1500),c=R(300,900);return mc(`في مكتبة المدرسة ${a} كتاب، وتبرّع الأهالي بـ ${b} كتابًا، واشترت المدرسة ${c} كتابًا. كم كتابًا في المكتبة الآن؟`,a+b+c,`الخطوة 1: ${a} + ${b} = ${a+b}<br>الخطوة 2: ${a+b} + ${c} = ${a+b+c}`,'w')},
+ ()=>{const a=R(1500,2500),b=R(1200,2200),c=R(100,400);return mc(`في المدرسة ${a} ولد و${b} بنتًا. غاب اليوم ${c} تلميذًا. كم تلميذًا حضر؟`,a+b-c,`الخطوة 1: ${a} + ${b} = ${a+b}<br>الخطوة 2: ${a+b} − ${c} = ${a+b-c}`,'w')},
+ ()=>{const a=R(1200,2500),b=R(800,1900),d=R(200,900),c=a+b+d;return mc(`قطع قطار ${a} كم صباحًا و${b} كم مساءً. إذا كانت الرحلة كلها ${c} كم، فكم كيلومترًا بقي؟`,d,`الخطوة 1: ${a} + ${b} = ${a+b}<br>الخطوة 2: ${c} − ${a+b} = ${d}`,'w')},
+ ()=>{const a=R(1100,2400),d=R(200,900);return mc(`جمع محمد ${a} جنيهًا، وجمعت سعاد ${d} جنيهًا أكثر منه. كم جمع الاثنان معًا؟`,a+a+d,`مبلغ سعاد: ${a} + ${d} = ${a+d}<br>المجموع: ${a} + ${a+d} = ${a+a+d}`,'w')},
+ ()=>{const a=R(3000,6000),b=R(400,1500),c=a-b+R(300,900);return mc(`في المزرعة ${a} بيضة، انكسرت منها ${b} بيضة. كم بيضة تلزم لتصبح ${c} بيضة؟`,c-(a-b),`الخطوة 1: ${a} − ${b} = ${a-b}<br>الخطوة 2: ${c} − ${a-b} = ${c-(a-b)}`,'w')},
+ ()=>{const a=R(4000,9000),b=R(1000,2500),c=R(500,1500);return mc(`في المخزن ${a} كرتونة. بيع منها ${b} صباحًا و${c} مساءً. كم كرتونة بقيت؟`,a-b-c,`الخطوة 1: ${b} + ${c} = ${b+c}<br>الخطوة 2: ${a} − ${b+c} = ${a-b-c}`,'w')},
+ ()=>{const b=R(2000,4000),c=R(1500,3500),d=R(300,1500),a=b+c+d;return mc(`يتّسع الملعب لـ ${a} متفرجًا. حضر ${b} في الشوط الأول وانضم ${c} في الثاني. كم مقعدًا فارغًا؟`,d,`الخطوة 1: ${b} + ${c} = ${b+c}<br>الخطوة 2: ${a} − ${b+c} = ${d}`,'w')}];
+ return sh(T).map(f=>f())}
+
+const exW=`عند أحمد 1250 جنيهًا، ادّخر 475 جنيهًا، ثم اشترى لعبة بـ 600. كم بقي معه؟<div class="ex" style="margin:6px 0">1250 + 475 = 1725<br>1725 − 600 = <b>1125</b> جنيهًا</div>`;
+const LV=[
+ {n:'المستوى الأول: السهل',e:'🔵',c:'#2f80ed',c2:'#dbeaff',t:30,gen:g1,
+  skill:'جمع وطرح الأعداد المكوّنة من 3 أرقام',how:'نرتّب الأعداد بحيث تكون الآحاد تحت الآحاد، ثم نجمع أو نطرح بادئين بالآحاد، ثم العشرات، ثم المئات.',
+  ex:`<b>جمع:</b> ${E('125 + 234')}<br>${addSteps(125,234)}<br>الناتج: <b>359</b><hr><b>طرح:</b> ${E('786 − 243')}<br>${subSteps(786,243)}<br>الناتج: <b>543</b>`},
+ {n:'المستوى الثاني: المتوسط',e:'🟢',c:'#27ae60',c2:'#dcf7e5',t:30,gen:g2,
+  skill:'جمع وطرح الأعداد المكوّنة من 4 أرقام مع إعادة التجميع',how:'نحتاج إلى الحمل عندما يكون مجموع منزلة 10 أو أكثر، وإلى الاستلاف عندما لا يكفي الرقم العلوي في المنزلة.',
+  ex:`<b>جمع بالحمل:</b> ${E('2567 + 1785')}<br>${addSteps(2567,1785)}<br>الناتج: <b>4352</b><hr><b>طرح بالاستلاف:</b> ${E('8765 − 2437')}<br>${subSteps(8765,2437)}<br>الناتج: <b>6328</b>`},
+ {n:'المستوى الثالث: الصعب',e:'🟠',c:'#f2711c',c2:'#ffe8d6',t:45,gen:g3,
+  skill:'مسائل كلامية على الجمع والطرح بأكثر من خطوة',how:'نقرأ المسألة جيدًا، نحدّد المطلوب، ثم نكتب العمليات بالترتيب ونحلّها خطوة خطوة.',ex:exW}];
+const START={c:'#ff6f91',c2:'#fff1c9'};
+function theme(o){document.documentElement.style.setProperty('--c',o.c);document.documentElement.style.setProperty('--c2',o.c2)}
+
+/* ---------- الحالة ---------- */
+let S={name:'',lvl:0,res:[],run:''},Q,qi,att,sc,cor,tm,wr,left,done,timer,qStart,autoT;
+const LB='rjb_leaderboard_v1';
+const getLB=()=>{try{return JSON.parse(localStorage.getItem(LB))||[]}catch(e){return[]}};
+function saveLB(e){try{const l=getLB();if(l.some(x=>x.id==e.id))return;l.push(e);localStorage.setItem(LB,JSON.stringify(l))}catch(e){}}
+const fmt=s=>{s=Math.round(s);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
+
+/* ---------- الشاشات ---------- */
+function start(){clearInterval(timer);theme(START);
+ app.innerHTML=`<div class="card"><div class="robot">🤖</div><h1>رحلة أبطال الجمع والطرح</h1>
+ <div class="bub">أهلًا يا بطل! أنا الروبوت «رقمي». ما اسمك؟</div>
+ <input id="nm" maxlength="20" placeholder="اكتب اسمك هنا" value="${S.name}" autocomplete="off">
+ <div id="err" class="row" style="color:#e53935;min-height:28px"></div>
+ <div class="row"><button class="btn" id="go">🚀 ابدأ المغامرة</button><button class="btn alt" id="lb">🏆 لوحة الصدارة</button></div></div>`;
+ const go=()=>{const v=$('#nm').value.trim();if(!v){$('#err').textContent='اكتب اسمك أولًا لتبدأ الرحلة ✏️';$('#nm').focus();return}S={name:v,lvl:0,res:[],run:Date.now()+'-'+R(1000,9999)};good();intro()};
+ $('#go').onclick=go;$('#nm').onkeydown=e=>{if(e.key=='Enter')go()};$('#lb').onclick=()=>board(start)}
+function intro(){const L=LV[S.lvl];theme(L);
+ app.innerHTML=`<div class="card"><h2>${L.e} ${L.n}</h2><div class="bub">مرحبًا ${S.name}! مهارتنا اليوم:<br><b>${L.skill}</b></div>
+ <p style="font-size:19px;line-height:1.8;text-align:center">${L.how}</p><div class="ex"><b>مثال محلول:</b><br>${L.ex}</div>
+ <p class="row" style="font-size:17px">⏱️ ${L.t} ثانية لكل سؤال • 🎯 محاولتان • النجاح بأكثر من نصف الدرجة</p>
+ <div class="row"><button class="btn" id="sq">▶ ابدأ الأسئلة</button></div></div>`;
+ $('#sq').onclick=()=>{Q=L.gen();qi=0;sc=0;cor=0;tm=0;wr=[];nextQ()}}
+function nextQ(){if(qi>=Q.length)return finish();clearTimeout(autoT);const L=LV[S.lvl],q=Q[qi];att=0;done=false;left=L.t;qStart=Date.now();
+ app.innerHTML=`<div class="card"><div class="top"><span>${L.e} سؤال ${qi+1} من ${Q.length}</span><span class="tm" id="tm">⏱ ${left}</span><span>⭐ ${sc}</span></div>
+ <div class="bar"><i style="width:${qi/Q.length*100}%"></i></div><div class="q">${q.q}</div>
+ <div class="opts">${q.o.map((o,i)=>`<button class="opt" data-i="${i}">${o}</button>`).join('')}</div><div id="fb"></div><div class="row" id="nx"></div></div>`;
+ document.querySelectorAll('.opt').forEach(b=>b.onclick=()=>pick(+b.dataset.i));
+ clearInterval(timer);timer=setInterval(()=>{left--;const t=$('#tm');if(t){t.textContent='⏱ '+left;if(left<=10){t.classList.add('warn');tick()}}if(left<=0)timeUp()},1000)}
+const fb=(c,h)=>$('#fb').innerHTML=`<div class="fb ${c}">${h}</div>`;
+function showNext(auto){const last=qi==Q.length-1;$('#nx').innerHTML=`<button class="btn" id="nb">${last?'🏁 إنهاء المستوى':'التالي ⬅'}</button>`;$('#nb').onclick=()=>{clearTimeout(autoT);qi++;nextQ()};if(auto)autoT=setTimeout(()=>{qi++;nextQ()},4500)}
+function lock(){done=true;clearInterval(timer);tm+=(Date.now()-qStart)/1000;document.querySelectorAll('.opt').forEach(b=>b.disabled=true)}
+function pick(i){if(done)return;const q=Q[qi],v=q.o[i],btn=document.querySelectorAll('.opt')[i];
+ if(v===q.a){const p=att?5:10;lock();sc+=p;cor++;btn.classList.add('ok');good();confetti();fb('good',`🎉 <b>أحسنت! إجابة صحيحة</b> (+${p} نقاط)<br>الإجابة: <b>${q.a}</b><div class="st">${q.st}</div>`);showNext()}
+ else{bad();btn.disabled=true;
+  if(att==0){att=1;const near=!isNaN(+v)&&Math.abs(+v-+q.a)%10==0;fb('warn',`🤔 <b>حاول مرة أخرى، أنت تستطيع!</b><br>إجابتك غير صحيحة. ${near?'اقتربت! راجع الحمل أو الاستلاف بين المنازل.':q.k=='w'?'اقرأ المسألة مرة أخرى وحدّد العمليات.':'راجع العملية خطوة خطوة بادئًا بالآحاد.'}`)}
+  else{lock();wr.push(q);document.querySelectorAll('.opt').forEach(b=>{if(b.textContent===q.a)b.classList.add('ok')});fb('bad',`💡 <b>انتهت المحاولتان.</b> الإجابة الصحيحة: <b>${q.a}</b><div class="st">${q.st}</div>`);showNext()}}}
+function timeUp(){if(done)return;lock();wr.push(Q[qi]);bad();document.querySelectorAll('.opt').forEach(b=>{if(b.textContent===Q[qi].a)b.classList.add('ok')});fb('bad',`⏰ <b>انتهى الوقت!</b> احتُسب السؤال خطأ. الإجابة: <b>${Q[qi].a}</b><div class="st">${Q[qi].st}</div>`);showNext(true)}
+function finish(){clearInterval(timer);const max=Q.length*10,pct=Math.round(sc/max*100),pass=sc>max/2;
+ S.res[S.lvl]={sc,max,cor,w:Q.length-cor,tm,pct};const L=LV[S.lvl],stars=pct>=90?3:pct>=70?2:pass?1:0;
+ if(pass)confetti();
+ app.innerHTML=`<div class="card"><h2>${L.e} نتيجة ${L.n}</h2><div class="robot" style="font-size:64px">${pass?'🏅':'💪'}</div>
+ <p class="row" style="font-size:24px">${S.name} • ${'⭐'.repeat(stars)||'—'}</p>
+ <div class="stats"><div class="stat">الدرجة<b>${sc}/${max}</b></div><div class="stat">صحيحة ✅<b>${cor}</b></div><div class="stat">خاطئة ❌<b>${Q.length-cor}</b></div><div class="stat">النسبة<b>${pct}%</b></div><div class="stat">الوقت<b>${fmt(tm)}</b></div></div>
+ <div class="bub">${pass?'ممتاز! لقد نجحت وتستطيع المتابعة 🎉':'تحتاج أكثر من نصف الدرجة لتنتقل. أعد المحاولة وستنجح! 💪'}</div>
+ ${wr.length?`<h2 style="font-size:22px">الأسئلة التي أخطأت فيها</h2>`+wr.map(q=>`<div class="rev">${q.q}<br>✔ الصواب: <b>${q.a}</b><br>${q.st}</div>`).join(''):''}
+ <div class="row">${pass?`<button class="btn" id="nl">${S.lvl<2?'المستوى التالي ➡':'🏁 النتيجة النهائية'}</button>`:''}<button class="btn alt" id="rt">🔄 إعادة المستوى</button></div></div>`;
+ if(pass)$('#nl').onclick=()=>{S.lvl++;S.lvl<3?intro():final()};
+ $('#rt').onclick=()=>{S.res.length=S.lvl;intro()}}
+function final(){theme(START);const r=S.res,T=k=>r.reduce((a,x)=>a+x[k],0),sc=T('sc'),mx=T('max'),pct=Math.round(sc/mx*100),cr=T('cor'),tt=T('tm');
+ saveLB({id:S.run,name:S.name,score:sc,correct:cr,time:Math.round(tt),pct,date:new Date().toLocaleDateString('ar-EG')});confetti();
+ const m=pct>=90?['🥇','بطل خارق!']:pct>=70?['🥈','بطل رائع!']:['🥉','بطل مجتهد!'];
+ app.innerHTML=`<div class="card"><div class="robot">${m[0]}</div><h1>${m[1]}</h1><div class="bub">أنهيت الرحلة كاملة يا ${S.name}!</div>
+ <div class="stats"><div class="stat">مجموع النقاط<b>${sc}/${mx}</b></div><div class="stat">الصحيحة ✅<b>${cr}</b></div><div class="stat">الخاطئة ❌<b>${T('w')}</b></div><div class="stat">النسبة<b>${pct}%</b></div><div class="stat">الوقت<b>${fmt(tt)}</b></div></div>
+ <table><tr><th>المستوى</th><th>الدرجة</th><th>النسبة</th></tr>${r.map((x,i)=>`<tr><td>${LV[i].e}</td><td>${x.sc}/${x.max}</td><td>${x.pct}%</td></tr>`).join('')}</table>
+ <div class="row" style="margin-top:12px"><button class="btn" id="pa">🔁 العب من جديد</button><button class="btn alt" id="lb">🏆 لوحة الصدارة</button></div></div>`;
+ $('#pa').onclick=()=>{S={name:S.name,lvl:0,res:[],run:Date.now()+'-'+R(1000,9999)};intro()};$('#lb').onclick=()=>board(final)}
+function board(back){theme(START);const l=getLB().sort((a,b)=>b.score-a.score||a.time-b.time),md=['🥇','🥈','🥉'];
+ app.innerHTML=`<div class="card"><h2>🏆 لوحة الصدارة</h2>${l.length?`<div style="overflow-x:auto"><table><tr><th>الترتيب</th><th>الاسم</th><th>النقاط</th><th>الصحيحة</th><th>الوقت</th></tr>${l.map((x,i)=>`<tr${x.id==S.run?' style="background:#fff1c9"':''}><td>${md[i]||i+1}</td><td>${x.name.replace(/[<>&]/g,'')}</td><td>${x.score}</td><td>${x.correct}</td><td>${fmt(x.time)}</td></tr>`).join('')}</table></div>`:'<div class="bub">لا توجد نتائج بعد. كن أول بطل!</div>'}
+ <div class="row" style="margin-top:12px"><button class="btn" id="bk">⬅ رجوع</button></div></div>`;
+ $('#bk').onclick=()=>back()}
+start();
+</script>
+</body>
+</html>
